@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zaky AI - Interface Profissional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* RESET E VARIÁVEIS */
+        :root {
+            --bg-color: #121212;
+            --chat-bg: #1e1e1e;
+            --user-msg: #2563eb;
+            --ai-msg: #2d2d2d;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background-color: var(--chat-bg);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        header .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ÁREA DO CHAT */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* Ocultar barra de rolagem mas manter a função */
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+        .message {
+            display: flex;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+        }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .bubble {
+            background-color: var(--user-msg);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .message.ai .bubble {
+            background-color: var(--ai-msg);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ANIMAÇÃO DE DIGITANDO */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: var(--ai-msg);
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.3s linear infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: -1.1s; }
+        .dot:nth-child(3) { animation-delay: -0.9s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+
+        /* ÁREA DE INPUT */
+        .input-area {
+            padding: 15px 20px;
+            background-color: var(--chat-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        button {
+            background-color: var(--user-msg);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            flex-shrink: 0;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background-color: #1d4ed8;
+        }
+
+        button i {
+            font-size: 1.2rem;
+            margin-left: -2px; /* Ajuste visual do ícone */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+            <h1>Zaky AI</h1>
+            <p>Assistente Virtual Online</p>
+        </div>
+    </header>
+
+    <main class="chat-container" id="chat-container">
+        <div class="message ai">
+            <div class="bubble">Olá! Eu sou a sua inteligência artificial. Como posso te ajudar a programar hoje?</div>
+        </div>
+        
+        <div class="typing-indicator" id="typing">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </main>
+
+    <footer class="input-area">
+        <div class="input-wrapper">
+            <textarea id="user-input" rows="1" placeholder="Envie uma mensagem para a IA..."></textarea>
+        </div>
+        <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+    </footer>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing');
+
+        // Auto-ajustar altura do textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            let newHeight = (this.scrollHeight) + 'px';
+            if (this.scrollHeight > 100) newHeight = '100px';
+            this.style.height = newHeight;
+        });
+
+        // Enviar com a tecla Enter (sem Shift)
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (text === '') return;
+
+            // Cria o balão do usuário
+            appendMessage(text, 'user');
+            
+            // Limpa o input
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            
+            // Mostra o indicador de digitação da IA
+            showTypingIndicator();
+
+            // Simula o tempo de resposta da IA (1.5 segundos)
+            setTimeout(() => {
+                hideTypingIndicator();
+                const aiResponse = getFakeAIResponse(text);
+                appendMessage(aiResponse, 'ai');
+            }, 1500);
+        }
+
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender);
+            
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            bubble.textContent = text;
+            
+            msgDiv.appendChild(bubble);
+            
+            // Insere antes do indicador de digitação
+            chatContainer.insertBefore(msgDiv, typingIndicator);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatContainer.appendChild(typingIndicator); // Move pro final
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Lógica falsa para a IA dar respostas automáticas baseadas no que você digita
+        function getFakeAIResponse(userText) {
+            const lowerText = userText.toLowerCase();
+            if (lowerText.includes('html') || lowerText.includes('css')) {
+                return 'Excelente! HTML e CSS formam a base da web. Quer que eu crie a estrutura de um site para você?';
+            } else if (lowerText.includes('javascript') || lowerText.includes('js')) {
+                return 'O JavaScript é o que dá vida à interface! O que vamos programar agora?';
+            } else if (lowerText.includes('script') || lowerText.includes('roblox')) {
+                return 'Parece que você tem experiência com Lua e Roblox! A lógica de programação web é bem parecida, só mudam as ferramentas.';
+            } else {
+                return 'Entendi perfeitamente. Pode me dar mais detalhes sobre o que você quer fazer?';
+            }
+        }
+    </script>
+</body>
+</html>
